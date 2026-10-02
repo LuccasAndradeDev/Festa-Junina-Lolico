@@ -1,0 +1,1012 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #e6b669;
+    color: #333;
+}
+
+/* HERO */
+
+.hero {
+    position: relative;
+    height: 350px;
+    overflow: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    color: white;
+}
+
+.video-bg {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    min-width: 100%;
+    min-height: 100%;
+
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+
+    z-index: -2;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    z-index: -1;
+}
+
+.header-content h1 {
+    font-size: 50px;
+    text-shadow: 2px 2px 10px black;
+}
+
+.header-content p {
+    font-size: 22px;
+    margin-top: 10px;
+
+    text-shadow: 2px 2px 8px black;
+}
+
+/* CONTAINER */
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px 0;
+}
+
+/* BANNER */
+
+.banner {
+    width: 100%;
+    border-radius: 20px;
+    margin-bottom: 30px;
+}
+
+/* DASHBOARD */
+
+.dashboard {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.dashboard-card {
+    flex: 1;
+
+    background: white;
+    padding: 20px;
+
+    border-radius: 20px;
+
+    text-align: center;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.dashboard-card h3 {
+    margin-bottom: 10px;
+}
+
+.dashboard-card p {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* FILTROS */
+
+.filtros {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.filtros input,
+.filtros select {
+    flex: 1;
+
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+
+    font-size: 16px;
+}
+
+/* PRODUTOS */
+
+.banner-ingresso{
+
+    width:95%;
+
+    margin:30px auto;
+
+    padding:45px;
+
+    border-radius:20px;
+
+    background:linear-gradient(135deg,#ff9800,#ff5722);
+
+    color:white;
+
+    text-align:center;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+}
+
+.banner-ingresso h1{
+
+    font-size:42px;
+
+    margin:15px 0;
+
+}
+
+.banner-ingresso p{
+
+    font-size:22px;
+
+}
+
+.destaque{
+
+    background:white;
+
+    color:#ff5722;
+
+    padding:8px 18px;
+
+    border-radius:30px;
+
+    font-weight:bold;
+
+}
+
+#comprar-ingresso{
+
+    margin-top:25px;
+
+    padding:18px 45px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+#produtos {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(250px, 1fr));
+
+    gap: 20px;
+
+    margin-bottom: 40px;
+}
+
+.card {
+    background: #fff;
+
+    border-radius: 20px;
+
+    padding: 20px;
+
+    text-align: center;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.produto-img {
+    width: 100%;
+    height: 180px;
+
+    object-fit: cover;
+
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+.card h2 {
+    margin-bottom: 10px;
+}
+
+.card p {
+    margin-bottom: 15px;
+}
+
+/* ESTOQUE */
+
+.estoque {
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.esgotado {
+    color: red;
+}
+
+/* CONTADOR */
+
+.contador {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 20px;
+}
+
+.contador button {
+    width: 45px;
+    height: 45px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: orange;
+    color: white;
+
+    font-size: 24px;
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.contador button:hover {
+    transform: scale(1.05);
+}
+
+.contador span {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* CARRINHO */
+
+.carrinho-box,
+.pagamento,
+.total-box {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 20px;
+
+    margin-bottom: 20px;
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.carrinho-box h2,
+.pagamento h2 {
+    margin-bottom: 20px;
+}
+
+#lista-carrinho p {
+    margin-bottom: 10px;
+}
+
+/* SELECT */
+
+select {
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 12px;
+    border: none;
+
+    font-size: 16px;
+}
+
+/* BOTÃO */
+
+.comprar {
+    width: 100%;
+
+    background: green;
+    color: white;
+
+    border: none;
+
+    padding: 18px;
+
+    border-radius: 14px;
+
+    font-size: 20px;
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+.comprar:hover {
+    transform: scale(1.02);
+}
+
+/* FOOTER */
+
+footer {
+    background: #7b3f00;
+    color: white;
+
+    text-align: center;
+
+    padding: 20px;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 768px) {
+
+    .header-content h1 {
+        font-size: 34px;
+    }
+
+    .header-content p {
+        font-size: 18px;
+    }
+
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .filtros {
+        flex-direction: column;
+    }
+
+    .carrinho-total {
+    margin-top: 20px;
+    padding-top: 20px;
+
+    border-top: 2px solid #eee;
+
+    text-align: right;
+}
+
+.carrinho-total h3 {
+    font-size: 24px;
+}
+}
+
+.dashboard{
+
+    display:flex;
+
+    gap:25px;
+
+    margin:30px;
+
+    flex-wrap:wrap;
+
+}
+
+.card-dashboard{
+
+    flex:1;
+
+    min-width:250px;
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:25px;
+
+    text-align:center;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.15);
+
+    transition:.3s;
+
+}
+
+.card-dashboard:hover{
+
+    transform:translateY(-8px);
+
+}
+
+.card-dashboard h3{
+
+    color:#777;
+
+    margin-bottom:10px;
+
+}
+
+.card-dashboard h2{
+
+    color:#1f7a1f;
+
+    font-size:35px;
+
+}
+
+/* ======================================================
+   PARTE 10 - RESPONSIVIDADE FINAL
+   Apenas adaptação de tela. Mantém o visual de desktop.
+====================================================== */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+img,
+video {
+    max-width: 100%;
+}
+
+@media (max-width: 900px) {
+    .container {
+        width: 94%;
+    }
+
+    #produtos {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .banner-ingresso {
+        width: 100%;
+        padding: 32px 24px;
+    }
+
+    .banner-ingresso h1 {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        height: 280px;
+        padding: 0 18px;
+    }
+
+    .header-content {
+        width: 100%;
+    }
+
+    .header-content h1 {
+        font-size: 34px;
+        line-height: 1.15;
+    }
+
+    .header-content p {
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    .container {
+        width: 94%;
+        padding: 22px 0;
+    }
+
+    .dashboard {
+        flex-direction: column;
+        margin: 20px 0 25px;
+        gap: 14px;
+    }
+
+    .dashboard-card,
+    .card-dashboard {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .filtros {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .filtros input,
+    .filtros select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .banner-ingresso {
+        margin: 22px auto;
+        padding: 28px 20px;
+    }
+
+    .banner-ingresso h1 {
+        font-size: 30px;
+        line-height: 1.15;
+    }
+
+    .banner-ingresso p {
+        font-size: 18px;
+        line-height: 1.45;
+    }
+
+    #btn-comprar-ingresso,
+    #comprar-ingresso {
+        max-width: 100%;
+        padding: 16px 24px;
+        font-size: 18px;
+    }
+
+    .carrinho-box,
+    .pagamento,
+    .total-box {
+        padding: 20px;
+    }
+
+    .carrinho-total {
+        text-align: left;
+    }
+
+    .carrinho-total h3 {
+        font-size: 21px;
+        line-height: 1.4;
+    }
+
+    #usuario-logado {
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 520px) {
+    .hero {
+        height: 230px;
+        padding: 0 14px;
+    }
+
+    .header-content h1 {
+        font-size: 27px;
+    }
+
+    .header-content p {
+        font-size: 16px;
+    }
+
+    .container {
+        width: 92%;
+        padding: 18px 0;
+    }
+
+    .dashboard-card {
+        padding: 17px;
+        border-radius: 15px;
+    }
+
+    .dashboard-card p {
+        font-size: 24px;
+    }
+
+    .banner-ingresso {
+        width: 100%;
+        padding: 22px 15px;
+        border-radius: 16px;
+    }
+
+    .banner-ingresso h1 {
+        font-size: 25px;
+    }
+
+    .banner-ingresso p {
+        font-size: 16px;
+    }
+
+    .destaque {
+        display: inline-block;
+        max-width: 100%;
+        padding: 7px 12px;
+        font-size: 13px;
+    }
+
+    #produtos {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+    .card {
+    width: 100%;
+    padding: 10px 6px;
+}
+
+.produto-img {
+    height: 100px;
+    margin-bottom: 8px;
+}
+
+.card h2 {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.card p {
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.contador {
+    gap: 5px;
+}
+
+.contador button {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    font-size: 17px;
+}
+
+.contador span {
+    font-size: 15px;
+}
+
+    .contador {
+        gap: 14px;
+    }
+
+    .contador button {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+    }
+
+    .carrinho-box,
+    .pagamento,
+    .total-box {
+        padding: 17px;
+        border-radius: 15px;
+    }
+
+    .comprar {
+        padding: 16px 12px;
+        font-size: 18px;
+    }
+
+    footer {
+        padding: 18px 12px;
+        font-size: 14px;
+    }
+
+    #logout-btn {
+        max-width: calc(100% - 24px);
+        margin-left: 12px;
+        margin-right: 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .header-content h1 {
+        font-size: 24px;
+    }
+
+    .banner-ingresso h1 {
+        font-size: 22px;
+    }
+
+    .card h2 {
+        font-size: 21px;
+    }
+}
+
+/* ======================================================
+   CORREÇÃO PARTE 10 - ÁREA DO CLIENTE
+   Mantém o visual atual e corrige os elementos adicionados
+   depois da versão-base do CSS.
+====================================================== */
+
+/* Usuário logado */
+#usuario-logado {
+    width: 90%;
+    max-width: 1200px;
+    margin: 18px auto 0;
+    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.10);
+}
+
+/* Sair */
+#logout-btn {
+    display: block;
+    margin: 18px auto 0;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #7b3f00;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Botão do banner de ingresso */
+#btn-comprar-ingresso,
+#comprar-ingresso {
+    margin-top: 25px;
+    padding: 18px 45px;
+    border: none;
+    border-radius: 12px;
+    background: #fff;
+    color: #d94700;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: 800;
+    box-shadow: 0 5px 12px rgba(0,0,0,.18);
+    transition: transform .2s, box-shadow .2s;
+}
+
+#btn-comprar-ingresso:hover,
+#comprar-ingresso:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgba(0,0,0,.22);
+}
+
+.contador-ingresso {
+    margin-top: 20px;
+}
+
+/* Botão Minhas Compras - cobre id, classe ou onclick */
+#btn-minhas-compras,
+.btn-minhas-compras,
+button[onclick*="carregarMinhasCompras"] {
+    display: block;
+    width: 100%;
+    margin: 0 0 20px 0;
+    padding: 25px;
+    border: none;
+    border-radius: 20px;
+    background: white;
+    color: #333;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+#btn-minhas-compras:hover,
+.btn-minhas-compras:hover,
+button[onclick*="carregarMinhasCompras"]:hover {
+    transform: translateY(-2px);
+    opacity: .95;
+}
+
+/* Lista de compras do cliente */
+#lista-minhas-compras {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto 25px;
+}
+
+.compra-cliente {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 18px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.10);
+}
+
+.compra-cliente > div:first-child {
+    flex: 1 1 230px;
+}
+
+.compra-cliente > button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 9px;
+    background: #e98b16;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.detalhes-compra {
+    flex-basis: 100%;
+    margin-top: 8px;
+}
+
+.sem-compras {
+    padding: 18px;
+    background: #fff;
+    border-radius: 12px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    #usuario-logado {
+        width: 92%;
+        margin-top: 12px;
+        padding: 11px 14px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    #logout-btn {
+        width: 92%;
+        max-width: 280px;
+    }
+
+    #btn-minhas-compras,
+    .btn-minhas-compras,
+    button[onclick*="carregarMinhasCompras"] {
+        width: 92%;
+        max-width: 320px;
+    }
+
+    #lista-minhas-compras {
+        width: 92%;
+    }
+
+    .compra-cliente {
+        padding: 15px;
+    }
+
+    .compra-cliente > button {
+        width: 100%;
+    }
+}
+
+
+/* ======================================================
+   AJUSTES CLIENTE - USUÁRIO / SAIR / MINHAS COMPRAS / AVISO
+====================================================== */
+
+.barra-usuario {
+    width: 90%;
+    max-width: 1200px;
+    margin: 14px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.barra-usuario #usuario-logado {
+    width: auto;
+    max-width: none;
+    flex: 1;
+    margin: 0;
+}
+
+.barra-usuario #logout-btn {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 8px 13px;
+    font-size: 13px;
+    border-radius: 8px;
+    flex: 0 0 auto;
+}
+
+#btn-minhas-compras {
+    margin: 0 0 20px auto;
+}
+
+/* Aviso flutuante da compra */
+.notificacao {
+    position: fixed;
+    top: 22px;
+    left: 50%;
+    transform: translate(-50%, -25px);
+    z-index: 9999;
+    width: min(92%, 440px);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #333;
+    box-shadow: 0 10px 35px rgba(0,0,0,.25);
+    border-left: 6px solid #e98b16;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease, visibility .25s ease;
+}
+
+.notificacao.mostrar {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.notificacao.sucesso {
+    border-left-color: #2e7d32;
+}
+
+.notificacao.erro {
+    border-left-color: #c62828;
+}
+
+.notificacao.aviso {
+    border-left-color: #f9a825;
+}
+
+.notificacao-icone {
+    font-size: 28px;
+    line-height: 1;
+}
+
+.notificacao-conteudo {
+    min-width: 0;
+}
+
+#notificacao-titulo {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 16px;
+}
+
+#notificacao-mensagem {
+    margin: 0;
+    line-height: 1.35;
+}
+
+@media (max-width: 600px) {
+    .barra-usuario {
+        width: 92%;
+        margin-top: 12px;
+    }
+
+    .barra-usuario #usuario-logado {
+        width: auto;
+        margin: 0;
+        text-align: left;
+    }
+
+    .barra-usuario #logout-btn {
+        width: auto;
+        max-width: none;
+        margin: 0;
+        padding: 7px 10px;
+        font-size: 12px;
+    }
+
+    #btn-minhas-compras {
+        width: 100%;
+        max-width: none;
+        margin: 0 0 18px;
+    }
+
+    .notificacao {
+        top: 12px;
+        padding: 14px 15px;
+    }
+}
+
+
+/* LAYOUT FINAL - CLIENTE */
+.dashboard { display: none !important; }
+.filtros { display: block; margin: 0 0 25px; }
+.filtros input { display: none; }
+.filtros select { width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 16px; cursor: pointer; }

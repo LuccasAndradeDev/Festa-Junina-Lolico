@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festa Junina Lolico</title>
+    <link rel="shortcut icon" href="favicon.png.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <!-- HERO -->
+    <header class="hero">
+        <video autoplay muted loop playsinline class="video-bg">
+            <source src="imagens/video.mp4.mp4" type="video/mp4">
+        </video>
+        <div class="overlay"></div>
+        <div class="header-content">
+            <h1>🌽 Festa Junina Lolico 🔥</h1>
+            <p>Compre ingressos, comidas e fichas online</p>
+        </div>
+    </header>
+
+    <div class="barra-usuario">
+        <p id="usuario-logado"></p>
+        <button id="logout-btn" onclick="logout()">🚪 Sair</button>
+    </div>
+
+    <main class="container">
+
+        <!-- CATEGORIAS -->
+        <section class="filtros">
+            <select id="categoria">
+                <option value="Todos">Todas categorias</option>
+                <option value="Ingressos">Ingressos</option>
+                <option value="Bebidas">Bebidas</option>
+                <option value="Comidas">Comidas</option>
+                <option value="Jogos">Jogos</option>
+            </select>
+        </section>
+
+<section class="banner-ingresso">
+
+    <div class="banner-texto">
+
+        <span class="destaque">
+            🎟 INGRESSO OFICIAL
+        </span>
+
+        <h1>
+            COMPRE SEU INGRESSO ANTECIPADO
+        </h1>
+
+        <p>
+
+            Evite filas e garanta sua entrada para a Festa Junina Lolico!
+
+        </p>
+
+        <button
+    type="button"
+    id="btn-comprar-ingresso"
+    onclick="comprarIngresso()">
+
+    Comprar Ingresso
+
+</button>
+
+<div
+    id="contador-ingresso"
+    class="contador contador-ingresso"
+    style="display: none;">
+
+    <button type="button" onclick="diminuirIngresso()">
+        −
+    </button>
+
+    <span id="qtd-ingresso">0</span>
+
+    <button type="button" onclick="aumentarIngresso()">
+        +
+    </button>
+
+</div>
+
+    </div>
+
+</section>
+
+        <!-- PRODUTOS -->
+        <section id="produtos"></section>
+
+        <!-- CARRINHO -->
+        <section class="carrinho-box">
+
+    <h2>🛒 Carrinho</h2>
+
+    <div id="lista-carrinho">
+        <p>Nenhum item adicionado.</p>
+    </div>
+
+    <div class="carrinho-total">
+        <h3>
+            Total do Carrinho:
+            R$ <span id="total-carrinho">
+                0.00
+            </span>
+        </h3>
+    </div>
+
+</section>
+
+        <!-- MINHAS COMPRAS -->
+        <button id="btn-minhas-compras" type="button" onclick="carregarMinhasCompras()">
+            🧾 Minhas Compras
+        </button>
+        <section id="lista-minhas-compras" style="display: none;"></section>
+
+        <!-- PAGAMENTO -->
+        <section class="pagamento">
+
+            <h2>💳 Método de pagamento</h2>
+
+            <select id="pagamento">
+                <option>PIX</option>
+                <option>Cartão de Crédito</option>
+                <option>Cartão de Débito</option>
+            </select>
+
+        </section>
+
+        <!-- FINALIZAR -->
+        <section class="total-box">
+
+            <button
+                class="comprar"
+                onclick="comprar()"
+            >
+                Finalizar Compra
+            </button>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+
+        <p>
+            Sistema de Vendas Festa Junina Lolico © 2026
+        </p>
+
+    </footer>
+
+    <!-- NOTIFICAÇÃO DA COMPRA -->
+    <div id="notificacao" class="notificacao" role="status" aria-live="polite">
+        <div id="notificacao-icone" class="notificacao-icone"></div>
+        <div class="notificacao-conteudo">
+            <strong id="notificacao-titulo"></strong>
+            <p id="notificacao-mensagem"></p>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/produtos.js"></script>
+    <script src="js/carrinho.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/filtros.js"></script>
+    <script src="js/app.js"></script>
+    
+</body>
+
+</html>

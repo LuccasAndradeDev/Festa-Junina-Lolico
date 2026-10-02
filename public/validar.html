@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Validar Ingresso</title>
+
+    <style>
+
+
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #5e1010,
+                    #991b1b
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+
+
+        .validacao {
+            width: 100%;
+            max-width: 520px;
+
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 20px;
+
+            box-shadow:
+                0 10px 35px
+                rgba(0,0,0,0.25);
+
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #8e1616;
+        }
+
+        .descricao {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        #reader {
+            width: 100%;
+
+            overflow: hidden;
+
+            border-radius: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .botoes {
+            display: flex;
+            gap: 10px;
+
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+
+            border: none;
+
+            border-radius: 10px;
+
+            padding: 13px;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        #btn-camera {
+            background: #8e1616;
+            color: white;
+        }
+
+        #btn-parar {
+            background: #444;
+            color: white;
+        }
+
+        .manual {
+            border-top: 1px solid #ddd;
+
+            padding-top: 20px;
+            margin-top: 10px;
+        }
+
+        .manual h3 {
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+
+            padding: 14px;
+
+            margin-bottom: 10px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 10px;
+
+            font-size: 15px;
+        }
+
+        #btn-validar-manual {
+            width: 100%;
+
+            background: #f9a825;
+            color: #333;
+        }
+
+        #resultado {
+    display: none;
+
+    margin-top: 20px;
+
+    padding: 35px 20px;
+
+    border-radius: 18px;
+
+    text-align: center;
+}
+
+#resultado h2 {
+    font-size: 32px;
+
+    margin-bottom: 15px;
+}
+
+#resultado p {
+    font-size: 18px;
+}
+
+#resultado strong {
+    font-size: 20px;
+}
+        #resultado h2 {
+            margin-top: 0;
+        }
+
+        .valido {
+    display: block !important;
+
+    background: #d8f3dc;
+
+    border: 3px solid #2e7d32;
+
+    color: #1b5e20;
+
+    box-shadow:
+        0 0 20px
+        rgba(46, 125, 50, 0.25);
+}
+
+.usado {
+    display: block !important;
+
+    background: #fff3cd;
+
+    border: 3px solid #f9a825;
+
+    color: #856404;
+
+    box-shadow:
+        0 0 20px
+        rgba(249, 168, 37, 0.25);
+}
+
+.invalido {
+    display: block !important;
+
+    background: #fdecea;
+
+    border: 3px solid #c62828;
+
+    color: #b71c1c;
+
+    box-shadow:
+        0 0 20px
+        rgba(198, 40, 40, 0.25);
+}
+
+        .aguardando {
+            display: block !important;
+
+            background: #e3f2fd;
+
+            border: 2px solid #1976d2;
+
+            color: #0d47a1;
+        }
+
+        .codigo-lido {
+            margin-top: 10px;
+
+            font-size: 11px;
+
+            word-break: break-all;
+
+            opacity: 0.8;
+        }
+
+        @media (max-width: 500px) {
+
+            body {
+                align-items: flex-start;
+                padding: 12px;
+            }
+
+            .validacao {
+                width: 100%;
+                max-width: 100%;
+                padding: 18px 14px;
+                margin: 8px auto;
+                border-radius: 16px;
+            }
+
+            h1 {
+                font-size: 26px;
+                line-height: 1.2;
+            }
+
+            .descricao {
+                font-size: 15px;
+                line-height: 1.4;
+            }
+
+            #reader {
+                max-width: 100%;
+            }
+
+            #reader video,
+            #reader canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
+            .botoes {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+                min-height: 46px;
+            }
+
+            #resultado {
+                padding: 24px 14px;
+            }
+
+            #resultado h2 {
+                font-size: 27px;
+                line-height: 1.2;
+            }
+
+            #resultado p {
+                font-size: 16px;
+                line-height: 1.4;
+                overflow-wrap: anywhere;
+            }
+
+            #resultado strong {
+                font-size: 18px;
+            }
+
+            input {
+                font-size: 16px;
+            }
+
+            .codigo-lido {
+                overflow-wrap: anywhere;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .validacao {
+                padding: 15px 11px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+
+            #resultado h2 {
+                font-size: 24px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <main class="validacao">
+
+        <h1>
+            🎟️ Validar Ingresso
+        </h1>
+
+        <p class="descricao">
+            Aponte a câmera para o QR Code do comprovante.
+        </p>
+
+
+        <!-- CÂMERA -->
+
+        <div id="reader"></div>
+
+
+        <div class="botoes">
+
+            <button
+                id="btn-camera"
+                type="button"
+                onclick="iniciarCamera()"
+            >
+                📷 Abrir câmera
+            </button>
+
+
+            <button
+                id="btn-parar"
+                type="button"
+                onclick="pararCamera()"
+            >
+                ⏹️ Parar câmera
+            </button>
+
+        </div>
+
+
+        <!-- RESULTADO -->
+
+        <div id="resultado"></div>
+
+
+        <!-- VALIDAÇÃO MANUAL -->
+
+        <section class="manual">
+
+            <h3>
+                Ou digite o código
+            </h3>
+
+            <input
+                type="text"
+                id="codigo"
+                placeholder="Código de validação"
+                autocomplete="off"
+            >
+
+            <button
+                id="btn-validar-manual"
+                type="button"
+                onclick="validarManual()"
+            >
+                Validar código
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- LEITOR DE QR CODE -->
+
+    <script
+        src="https://unpkg.com/html5-qrcode"
+        type="text/javascript">
+    </script>
+
+
+    <script src="js/validar.js"></script>
+
+
+</body>
+
+</html>

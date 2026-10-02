@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Adicionar Produto</title>
+
+    <link rel="stylesheet" href="css/admin.css">
+
+</head>
+
+<body>
+
+    <div class="pagina-adicionar">
+
+        <h1>➕ Adicionar Produto</h1>
+
+        <div class="formulario">
+
+             <input
+    type="text"
+    id="categoria"
+                placeholder="Categoria (Comida, Bebida, Ingresso...)">
+
+            <input
+                type="text"
+                id="nome"
+                placeholder="Nome do produto">
+
+            <input
+                type="number"
+                id="preco"
+                step="0.01"
+                placeholder="Preço">
+
+            <input
+                type="number"
+                id="estoque"
+                placeholder="Quantidade em estoque">
+
+            <input
+                type="text"
+                id="imagem"
+                placeholder="Nome da imagem (ex: pipoca.png)">
+
+            <button onclick="salvarProduto()">
+
+                Salvar Produto
+
+            </button>
+
+            <button onclick="window.location.href='admin.html'">
+
+                Voltar
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <script src="js/adicionar-produto.js"></script>
+
+</body>
+
+</html>

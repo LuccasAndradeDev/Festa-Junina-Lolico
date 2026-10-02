@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Painel Administrativo</title>
+
+    <link
+        rel="stylesheet"
+        href="css/admin.css"
+    >
+
+</head>
+
+<body>
+
+    <div class="painel-admin">
+
+    <aside class="sidebar">
+
+        <h1>👑 Painel Administrativo</h1>
+
+        <p id="bem-vindo"></p>
+
+        <!-- MENU -->
+
+        <div class="menu">
+
+            <button id="btn-dashboard">
+                📊 Dashboard
+            </button>
+
+            <button id="btn-produtos">
+                📦 Produtos
+            </button>
+
+            <button id="btn-adicionar">
+                ➕ Adicionar Produto
+            </button>
+
+            <button id="btn-vendas">
+                📋 Histórico de Vendas
+            </button>
+
+            <button id="btn-estoque">
+                📈 Controle de Estoque
+            </button>
+
+            <button id="btn-sair">
+                🚪 Sair
+            </button>
+
+        </div>
+    </aside>
+
+    <main class="conteudo-admin">
+
+        <!-- ========================= -->
+        <!-- PRODUTOS -->
+        <!-- ========================= -->
+
+        <section
+            id="lista-produtos"
+            style="display: none;"
+        ></section>
+
+
+        <!-- ========================= -->
+        <!-- DASHBOARD -->
+        <!-- ========================= -->
+
+        <section
+            id="dashboard-admin"
+            style="display: none;"
+        >
+
+            <h2>📊 Resumo das Vendas</h2>
+
+            <div class="dashboard-admin">
+
+                <div class="card-dashboard">
+
+                    <h3>💰 Faturamento</h3>
+
+                    <p id="dash-faturamento">
+                        R$ 0,00
+                    </p>
+
+                </div>
+
+
+                <div class="card-dashboard">
+
+                    <h3>🛒 Vendas</h3>
+
+                    <p id="dash-vendas">
+                        0
+                    </p>
+
+                </div>
+
+
+                <div class="card-dashboard">
+
+                    <h3>📦 Itens Vendidos</h3>
+
+                    <p id="dash-itens">
+                        0
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- HISTÓRICO -->
+        <!-- ========================= -->
+
+        <section
+            id="historico-vendas"
+            style="display: none;"
+        >
+
+            <h2>📋 Histórico de Vendas</h2>
+
+            <div id="lista-vendas"></div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- EDITAR PRODUTO -->
+        <!-- ========================= -->
+
+        <section
+            id="editar-produto"
+            style="display: none;"
+        >
+
+            <h2>✏️ Editar Produto</h2>
+
+            <input
+                type="hidden"
+                id="editar-id"
+            >
+
+            <label>Nome</label>
+
+            <input
+                type="text"
+                id="editar-nome"
+            >
+
+
+            <label>Preço</label>
+
+            <input
+                type="number"
+                id="editar-preco"
+                step="0.01"
+            >
+
+
+            <label>Estoque</label>
+
+            <input
+                type="number"
+                id="editar-estoque"
+            >
+
+
+            <label>Categoria</label>
+
+            <input
+                type="text"
+                id="editar-categoria"
+            >
+
+
+            <label>Imagem</label>
+
+            <input
+                type="text"
+                id="editar-imagem"
+            >
+
+
+            <button onclick="salvarEdicao()">
+                💾 Salvar Alterações
+            </button>
+
+            <button onclick="cancelarEdicao()">
+                ❌ Cancelar
+            </button>
+
+        </section>
+    </main>
+    </div>
+
+
+    <script src="js/admin.js"></script>
+
+</body>
+
+</html>
