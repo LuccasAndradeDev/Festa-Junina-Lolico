@@ -97,7 +97,7 @@ Veja `.env.example` para a lista de variáveis necessárias:
 - `SESSION_SECRET`: segredo para assinar as sessões.
 - `NODE_ENV`: ambiente de execução.
 - `PORT`: porta HTTP (o Railway define esse valor no deploy).
-- `BASE_URL`: URL usada nos QR Codes dos ingressos gerados no PDF.
+- `BASE_URL`: URL usada nos QR Codes dos ingressos gerados no PDF. No Railway, configure-a com a URL pública do site (por exemplo, `https://festa-junina-lolico-production.up.railway.app`) para que os QR Codes não apontem para `localhost`.
 
 Não publique seu arquivo `.env`, senhas, tokens ou backups do banco de dados.
 
