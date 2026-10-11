@@ -4,3 +4,9 @@ node_modules/
 !.env.example
 uploads/
 .vscode/
+
+# Backups e dumps de banco de dados: nunca versionar
+*.sql
+*.sql.gz
+*.dump
+*.bak
