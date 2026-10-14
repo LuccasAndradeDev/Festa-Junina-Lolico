@@ -44,7 +44,7 @@
 
         .validacao {
             width: 100%;
-            max-width: 520px;
+            max-width: 960px;
 
             background: white;
 
@@ -227,15 +227,150 @@
 
         .codigo-lido {
             margin-top: 10px;
-
             font-size: 11px;
-
             word-break: break-all;
-
             opacity: 0.8;
         }
 
+        .pedidos-section {
+            margin: 24px 0;
+            padding: 20px;
+            border: 1px solid #f0d7b0;
+            border-radius: 16px;
+            background: #fffaf2;
+            text-align: left;
+        }
+
+        .pedidos-section h2 {
+            margin: 0 0 8px;
+            color: #8e1616;
+            font-size: 23px;
+        }
+
+        .pedidos-ajuda {
+            margin: 0 0 16px;
+            color: #555;
+            line-height: 1.45;
+        }
+
+        .pedidos-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        #busca-pedido {
+            flex: 1;
+            min-width: 0;
+            margin: 0;
+            background: #fff;
+        }
+
+        #btn-buscar-pedido {
+            flex: 0 0 170px;
+            background: #8e1616;
+            color: white;
+        }
+
+        #resultado-pedidos {
+            margin-top: 12px;
+        }
+
+        .pedido-card {
+            margin-top: 14px;
+            padding: 16px;
+            border: 1px solid #e3d8ca;
+            border-radius: 12px;
+            background: white;
+        }
+
+        .pedido-card h3 {
+            margin: 0 0 8px;
+            color: #333;
+        }
+
+        .pedido-meta {
+            margin: 5px 0;
+            color: #555;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .pedido-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-top: 1px solid #eee;
+        }
+
+        .pedido-item-info {
+            min-width: 0;
+        }
+
+        .pedido-item-nome {
+            display: block;
+            color: #222;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .pedido-item-detalhe {
+            display: block;
+            margin-top: 4px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .btn-consumir-item {
+            flex: 0 0 auto;
+            min-width: 160px;
+            background: #2e7d32;
+            color: white;
+        }
+
+        .btn-consumir-item:disabled {
+            background: #d8f3dc;
+            color: #1b5e20;
+            cursor: default;
+            opacity: 1;
+        }
+
+        .pedido-mensagem {
+            padding: 12px;
+            border-radius: 9px;
+            background: #f4f4f4;
+            color: #444;
+        }
+
         @media (max-width: 500px) {
+            .pedidos-section {
+                padding: 15px 12px;
+            }
+
+            .pedidos-section h2 {
+                font-size: 21px;
+            }
+
+            .pedidos-form {
+                flex-direction: column;
+            }
+
+            #btn-buscar-pedido {
+                flex: 1;
+            }
+
+            .pedido-item {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .btn-consumir-item {
+                width: 100%;
+                min-width: 0;
+            }
+
+
 
             body {
                 align-items: flex-start;
@@ -334,9 +469,31 @@
         </h1>
 
         <p class="descricao">
-            Aponte a câmera para o QR Code do comprovante.
+            Use o QR Code para validar ingressos ou localize um pedido para entregar os itens.
         </p>
 
+        <!-- CONSULTAR PEDIDOS E MARCAR ITENS COMO CONSUMIDOS -->
+        <section class="pedidos-section" id="pedidos-section">
+            <h2>📦 Entrega de pedidos</h2>
+            <p class="pedidos-ajuda">
+                Pesquise pelo número do pedido do comprovante ou pelo telefone cadastrado do cliente.
+                Cada item pode ser marcado como consumido uma única vez.
+            </p>
+
+            <form class="pedidos-form" id="form-buscar-pedido">
+                <input
+                    id="busca-pedido"
+                    type="text"
+                    placeholder="Número do pedido ou telefone com DDD"
+                    autocomplete="off"
+                    aria-label="Número do pedido ou telefone do cliente"
+                    required
+                >
+                <button id="btn-buscar-pedido" type="submit">🔎 Buscar pedido</button>
+            </form>
+
+            <div id="resultado-pedidos" aria-live="polite"></div>
+        </section>
 
         <!-- CÂMERA -->
 
