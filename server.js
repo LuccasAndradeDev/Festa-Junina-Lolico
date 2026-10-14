@@ -118,6 +118,18 @@ function cpfLimpoValido(cpf) {
     return limpo.length === 11 ? limpo : null;
 }
 
+function telefoneLimpoValido(telefone) {
+    if (typeof telefone !== "string" && typeof telefone !== "number") return null;
+    let limpo = String(telefone).replace(/\D/g, "");
+
+    // Aceita números brasileiros com DDD, com ou sem o código do país +55.
+    if ((limpo.length === 12 || limpo.length === 13) && limpo.startsWith("55")) {
+        limpo = limpo.slice(2);
+    }
+
+    return limpo.length === 10 || limpo.length === 11 ? limpo : null;
+}
+
 function criarErroPublico(status, mensagem) {
     const erro = new Error(mensagem);
     erro.statusPublico = status;
@@ -353,6 +365,7 @@ app.get("/sessao/cliente", exigirCliente, (req, res) => {
 app.post("/clientes/cadastro", async (req, res) => {
     const nome = String(req.body?.nome || "").trim();
     const cpfLimpo = cpfLimpoValido(req.body?.cpf);
+    const telefone = telefoneLimpoValido(req.body?.telefone);
     const senha = String(req.body?.senha || "");
 
     if (!textoValido(nome, 2, 100)) {
@@ -366,6 +379,13 @@ app.post("/clientes/cadastro", async (req, res) => {
         return res.status(400).json({
             sucesso: false,
             mensagem: "CPF inválido."
+        });
+    }
+
+    if (!telefone) {
+        return res.status(400).json({
+            sucesso: false,
+            mensagem: "Informe um telefone com DDD (10 ou 11 dígitos)."
         });
     }
 
@@ -392,9 +412,9 @@ app.post("/clientes/cadastro", async (req, res) => {
         const senhaHash = await bcrypt.hash(senha, 10);
 
         const [resultado] = await db.promise().query(
-            `INSERT INTO clientes (nome, cpf, senha)
-             VALUES (?, ?, ?)`,
-            [nome, cpfLimpo, senhaHash]
+            `INSERT INTO clientes (nome, cpf, telefone, senha)
+             VALUES (?, ?, ?, ?)`,
+            [nome, cpfLimpo, telefone, senhaHash]
         );
 
         return res.status(201).json({
@@ -927,6 +947,213 @@ app.get("/vendas/:id", async (req, res) => {
         });
     }
 });
+
+// ==========================================
+// PEDIDOS DO FUNCIONÁRIO - CONSULTA E ENTREGA
+// Funcionários e administradores podem consultar por número do pedido
+// ou telefone e marcar cada item como consumido.
+// ==========================================
+
+app.get("/funcionario/pedidos", exigirStaff, async (req, res) => {
+    const entrada = String(req.query?.busca || "").trim();
+    let digitos = entrada.replace(/\D/g, "");
+
+    if ((digitos.length === 12 || digitos.length === 13) && digitos.startsWith("55")) {
+        digitos = digitos.slice(2);
+    }
+
+    if (!digitos) {
+        return res.status(400).json({
+            sucesso: false,
+            mensagem: "Informe o número do pedido ou o telefone do cliente."
+        });
+    }
+
+    const buscarPorTelefone = digitos.length === 10 || digitos.length === 11;
+
+    if (!buscarPorTelefone && digitos.length > 9) {
+        return res.status(400).json({
+            sucesso: false,
+            mensagem: "Informe um número de pedido ou um telefone brasileiro com DDD."
+        });
+    }
+
+    try {
+        const sqlVendas = `
+            SELECT
+                v.id,
+                v.data_venda,
+                v.total,
+                v.pagamento,
+                c.nome AS cliente,
+                RIGHT(COALESCE(c.telefone, ''), 4) AS telefone_final
+            FROM vendas v
+            INNER JOIN clientes c ON c.id = v.id_cliente
+            WHERE ${buscarPorTelefone ? "c.telefone = ?" : "v.id = ?"}
+            ORDER BY v.data_venda DESC
+            LIMIT 20
+        `;
+
+        const valorBusca = buscarPorTelefone ? digitos : Number(digitos);
+        const [vendas] = await db.promise().query(sqlVendas, [valorBusca]);
+
+        if (vendas.length === 0) {
+            return res.json({
+                sucesso: true,
+                pedidos: [],
+                mensagem: "Nenhum pedido encontrado."
+            });
+        }
+
+        const idsVendas = vendas.map((venda) => Number(venda.id));
+        const [itens] = await db.promise().query(
+            `SELECT
+                iv.id,
+                iv.id_venda,
+                p.nome,
+                p.categoria,
+                iv.quantidade,
+                iv.consumido,
+                iv.preco
+             FROM itens_venda iv
+             INNER JOIN produtos p ON p.id = iv.id_produto
+             WHERE iv.id_venda IN (?)
+             ORDER BY iv.id ASC`,
+            [idsVendas]
+        );
+
+        const pedidosPorId = new Map(
+            vendas.map((venda) => [
+                String(venda.id),
+                {
+                    id: Number(venda.id),
+                    data_venda: venda.data_venda,
+                    total: Number(venda.total),
+                    pagamento: venda.pagamento,
+                    cliente: venda.cliente,
+                    telefone_final: venda.telefone_final || "",
+                    itens: []
+                }
+            ])
+        );
+
+        for (const item of itens) {
+            const pedido = pedidosPorId.get(String(item.id_venda));
+            if (!pedido) continue;
+
+            pedido.itens.push({
+                id: Number(item.id),
+                nome: item.nome,
+                categoria: item.categoria,
+                quantidade: Number(item.quantidade),
+                consumido: Boolean(Number(item.consumido)),
+                preco: Number(item.preco)
+            });
+        }
+
+        return res.json({
+            sucesso: true,
+            pedidos: Array.from(pedidosPorId.values())
+        });
+    }
+    catch (erro) {
+        console.error("Erro ao consultar pedidos para entrega:", erro);
+        return res.status(500).json({
+            sucesso: false,
+            mensagem: "Erro ao consultar pedidos."
+        });
+    }
+});
+
+app.post(
+    "/funcionario/pedidos/:id/itens/:idItem/consumir",
+    exigirStaff,
+    async (req, res) => {
+        const idVenda = Number(req.params.id);
+        const idItem = Number(req.params.idItem);
+
+        if (!idValido(idVenda) || !idValido(idItem)) {
+            return res.status(400).json({
+                sucesso: false,
+                mensagem: "Pedido ou item inválido."
+            });
+        }
+
+        let connection;
+
+        try {
+            connection = await db.promise().getConnection();
+            await connection.beginTransaction();
+
+            const [itens] = await connection.query(
+                `SELECT id, quantidade, consumido
+                 FROM itens_venda
+                 WHERE id = ? AND id_venda = ?
+                 FOR UPDATE`,
+                [idItem, idVenda]
+            );
+
+            if (itens.length === 0) {
+                await connection.rollback();
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: "Item não encontrado neste pedido."
+                });
+            }
+
+            if (Boolean(Number(itens[0].consumido))) {
+                await connection.rollback();
+                return res.status(409).json({
+                    sucesso: false,
+                    consumido: true,
+                    mensagem: "Este item já foi marcado como consumido."
+                });
+            }
+
+            const [atualizacao] = await connection.query(
+                `UPDATE itens_venda
+                 SET consumido = 1
+                 WHERE id = ? AND id_venda = ? AND consumido = 0`,
+                [idItem, idVenda]
+            );
+
+            if (atualizacao.affectedRows !== 1) {
+                await connection.rollback();
+                return res.status(409).json({
+                    sucesso: false,
+                    mensagem: "O item já foi marcado como consumido por outro funcionário."
+                });
+            }
+
+            await connection.commit();
+
+            return res.json({
+                sucesso: true,
+                consumido: true,
+                mensagem: "Item marcado como consumido."
+            });
+        }
+        catch (erro) {
+            if (connection) {
+                try {
+                    await connection.rollback();
+                }
+                catch (erroRollback) {
+                    console.error("Erro ao desfazer marcação de consumo:", erroRollback);
+                }
+            }
+
+            console.error("Erro ao marcar item como consumido:", erro);
+            return res.status(500).json({
+                sucesso: false,
+                mensagem: "Erro ao atualizar o consumo do item."
+            });
+        }
+        finally {
+            if (connection) connection.release();
+        }
+    }
+);
 
 // ==========================================
 // DASHBOARD - ADMIN
