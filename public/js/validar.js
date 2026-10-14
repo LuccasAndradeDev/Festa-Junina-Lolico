@@ -125,6 +125,11 @@ window.addEventListener(
             return;
         }
 
+        const formPedidos = document.getElementById("form-buscar-pedido");
+        if (formPedidos) {
+            formPedidos.addEventListener("submit", buscarPedidos);
+        }
+
         const parametros =
             new URLSearchParams(
                 window.location.search
@@ -160,9 +165,13 @@ window.addEventListener(
                     "reader"
                 );
 
+            const pedidosSection =
+                document.getElementById("pedidos-section");
+
             if (manual) manual.style.display = "none";
             if (botoes) botoes.style.display = "none";
             if (reader) reader.style.display = "none";
+            if (pedidosSection) pedidosSection.style.display = "none";
 
             validarIngresso(codigo);
         }
@@ -842,4 +851,141 @@ function tocarSomErro() {
 
     }
 
+}
+
+// ==========================================
+// CONSULTA DE PEDIDOS E CONTROLE DE ENTREGA
+// ==========================================
+
+function formatarValorBRL(valor) {
+    return Number(valor || 0).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+}
+
+function formatarDataPedido(valor) {
+    if (!valor) return "Data não informada";
+    const data = new Date(valor);
+    if (Number.isNaN(data.getTime())) return String(valor);
+    return data.toLocaleString("pt-BR");
+}
+
+async function buscarPedidos(event) {
+    if (event) event.preventDefault();
+
+    const campoBusca = document.getElementById("busca-pedido");
+    const resultadoPedidos = document.getElementById("resultado-pedidos");
+    if (!campoBusca || !resultadoPedidos || !sessaoValidadorPronta) return;
+
+    await carregarPedidos(campoBusca.value.trim());
+}
+
+async function carregarPedidos(busca) {
+    const resultadoPedidos = document.getElementById("resultado-pedidos");
+    if (!resultadoPedidos) return;
+
+    if (!busca) {
+        resultadoPedidos.innerHTML = '<p class="pedido-mensagem">Informe o número do pedido ou o telefone com DDD.</p>';
+        return;
+    }
+
+    resultadoPedidos.innerHTML = '<p class="pedido-mensagem">🔎 Buscando pedidos...</p>';
+
+    try {
+        const resposta = await fetch("/funcionario/pedidos?busca=" + encodeURIComponent(busca));
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            resultadoPedidos.innerHTML = `<p class="pedido-mensagem">${escaparHTML(dados.mensagem || "Não foi possível buscar o pedido.")}</p>`;
+            return;
+        }
+
+        if (!dados.pedidos || dados.pedidos.length === 0) {
+            resultadoPedidos.innerHTML = `<p class="pedido-mensagem">${escaparHTML(dados.mensagem || "Nenhum pedido encontrado.")}</p>`;
+            return;
+        }
+
+        resultadoPedidos.innerHTML = dados.pedidos.map((pedido) => {
+            const itensHtml = pedido.itens.map((item) => {
+                const estado = item.consumido
+                    ? "✅ Item consumido"
+                    : "⏳ Aguardando entrega";
+                const botao = item.consumido
+                    ? '<button type="button" class="btn-consumir-item" disabled>✅ Consumido</button>'
+                    : `<button type="button" class="btn-consumir-item" data-venda="${Number(pedido.id)}" data-item="${Number(item.id)}" onclick="marcarItemConsumido(${Number(pedido.id)}, ${Number(item.id)})">☑ Marcar consumido</button>`;
+
+                return `
+                    <div class="pedido-item">
+                        <div class="pedido-item-info">
+                            <span class="pedido-item-nome">${escaparHTML(item.nome)}</span>
+                            <span class="pedido-item-detalhe">Quantidade comprada: ${Number(item.quantidade)} · Subtotal: ${formatarValorBRL(Number(item.preco) * Number(item.quantidade))}</span>
+                            <span class="pedido-item-detalhe">${estado}</span>
+                        </div>
+                        ${botao}
+                    </div>
+                `;
+            }).join("");
+
+            const telefone = pedido.telefone_final
+                ? `Telefone terminado em •••• ${escaparHTML(pedido.telefone_final)}`
+                : "Telefone não cadastrado neste pedido";
+
+            return `
+                <article class="pedido-card">
+                    <h3>Pedido #${Number(pedido.id)}</h3>
+                    <p class="pedido-meta"><strong>Cliente:</strong> ${escaparHTML(pedido.cliente)}</p>
+                    <p class="pedido-meta">${telefone}</p>
+                    <p class="pedido-meta"><strong>Data:</strong> ${escaparHTML(formatarDataPedido(pedido.data_venda))}</p>
+                    <p class="pedido-meta"><strong>Total:</strong> ${formatarValorBRL(pedido.total)}</p>
+                    <div class="pedido-itens">${itensHtml || '<p class="pedido-mensagem">Este pedido não possui itens.</p>'}</div>
+                </article>
+            `;
+        }).join("");
+    }
+    catch (erro) {
+        console.error("Erro ao buscar pedidos:", erro);
+        resultadoPedidos.innerHTML = '<p class="pedido-mensagem">Erro de conexão ao consultar os pedidos.</p>';
+    }
+}
+
+async function marcarItemConsumido(idVenda, idItem) {
+    if (!sessaoValidadorPronta) return;
+
+    const botao = document.querySelector(
+        '.btn-consumir-item[data-venda="' + Number(idVenda) + '"][data-item="' + Number(idItem) + '"]'
+    );
+    const campoBusca = document.getElementById("busca-pedido");
+    if (!botao || botao.disabled) return;
+
+    botao.disabled = true;
+    botao.textContent = "Registrando...";
+
+    try {
+        const resposta = await fetch(
+            "/funcionario/pedidos/" + Number(idVenda) + "/itens/" + Number(idItem) + "/consumir",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({})
+            }
+        );
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            alert(dados.mensagem || "Não foi possível marcar o item como consumido.");
+            botao.disabled = false;
+            botao.textContent = "☑ Marcar consumido";
+            return;
+        }
+
+        await carregarPedidos(campoBusca ? campoBusca.value.trim() : String(idVenda));
+    }
+    catch (erro) {
+        console.error("Erro ao marcar item como consumido:", erro);
+        alert("Erro de conexão ao marcar o item. Tente novamente.");
+        botao.disabled = false;
+        botao.textContent = "☑ Marcar consumido";
+    }
 }
