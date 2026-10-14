@@ -245,6 +245,12 @@ async function cadastrarCliente() {
             .value
             .replace(/\D/g, "");
 
+    const telefone =
+        document
+            .getElementById("telefone-cadastro")
+            .value
+            .replace(/\D/g, "");
+
     const senha =
         document
             .getElementById("senha-cadastro")
@@ -259,6 +265,7 @@ async function cadastrarCliente() {
     if (
         !nome ||
         !cpf ||
+        !telefone ||
         !senha ||
         !confirmar
     ) {
@@ -282,6 +289,12 @@ async function cadastrarCliente() {
 
     }
 
+    if (telefone.length !== 10 && telefone.length !== 11) {
+        mostrarMensagem(
+            "Digite um telefone com DDD (10 ou 11 dígitos)."
+        );
+        return;
+    }
 
     if (senha !== confirmar) {
 
@@ -311,6 +324,7 @@ async function cadastrarCliente() {
                         JSON.stringify({
                             nome,
                             cpf,
+                            telefone,
                             senha
                         })
                 }
