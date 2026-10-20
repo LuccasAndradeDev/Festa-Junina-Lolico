@@ -1013,7 +1013,7 @@ app.get("/funcionario/pedidos", exigirStaff, async (req, res) => {
                 p.nome,
                 p.categoria,
                 iv.quantidade,
-                iv.consumido,
+                iv.quantidade_consumida,
                 iv.preco
              FROM itens_venda iv
              INNER JOIN produtos p ON p.id = iv.id_produto
@@ -1046,7 +1046,7 @@ app.get("/funcionario/pedidos", exigirStaff, async (req, res) => {
                 nome: item.nome,
                 categoria: item.categoria,
                 quantidade: Number(item.quantidade),
-                consumido: Boolean(Number(item.consumido)),
+                quantidade_consumida: Number(item.quantidade_consumida || 0),
                 preco: Number(item.preco)
             });
         }
@@ -1086,7 +1086,7 @@ app.post(
             await connection.beginTransaction();
 
             const [itens] = await connection.query(
-                `SELECT id, quantidade, consumido
+                `SELECT id, quantidade, quantidade_consumida
                  FROM itens_venda
                  WHERE id = ? AND id_venda = ?
                  FOR UPDATE`,
@@ -1101,20 +1101,35 @@ app.post(
                 });
             }
 
-            if (Boolean(Number(itens[0].consumido))) {
+            const quantidade = Number(itens[0].quantidade);
+            const quantidadeConsumida = Number(itens[0].quantidade_consumida || 0);
+
+            if (quantidadeConsumida >= quantidade) {
                 await connection.rollback();
                 return res.status(409).json({
                     sucesso: false,
-                    consumido: true,
-                    mensagem: "Este item já foi marcado como consumido."
+                    completo: true,
+                    quantidade,
+                    quantidade_consumida: quantidadeConsumida,
+                    mensagem: "Todas as unidades deste item já foram entregues."
                 });
             }
 
+            const novaQuantidadeConsumida = quantidadeConsumida + 1;
+            const completo = novaQuantidadeConsumida >= quantidade;
+
             const [atualizacao] = await connection.query(
                 `UPDATE itens_venda
-                 SET consumido = 1
-                 WHERE id = ? AND id_venda = ? AND consumido = 0`,
-                [idItem, idVenda]
+                 SET quantidade_consumida = ?,
+                     consumido = ?
+                 WHERE id = ? AND id_venda = ? AND quantidade_consumida = ?`,
+                [
+                    novaQuantidadeConsumida,
+                    completo ? 1 : 0,
+                    idItem,
+                    idVenda,
+                    quantidadeConsumida
+                ]
             );
 
             if (atualizacao.affectedRows !== 1) {
@@ -1129,8 +1144,12 @@ app.post(
 
             return res.json({
                 sucesso: true,
-                consumido: true,
-                mensagem: "Item marcado como consumido."
+                completo,
+                quantidade,
+                quantidade_consumida: novaQuantidadeConsumida,
+                mensagem: completo
+                    ? "Todas as unidades deste item foram entregues."
+                    : `Unidade entregue. Progresso: ${novaQuantidadeConsumida} de ${quantidade}.`
             });
         }
         catch (erro) {
