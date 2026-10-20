@@ -11,4 +11,4 @@ ALTER TABLE itens_venda
 
 UPDATE itens_venda
 SET quantidade_consumida = quantidade
-WHERE consumido = 1;
+WHERE consumido = 1 AND id > 0;
