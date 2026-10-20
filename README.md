@@ -18,7 +18,7 @@ Aplicação web para simular as vendas e a organização de uma festa junina. Pr
 - Emissão de ingressos individuais com QR Code.
 - Validação de ingressos por funcionários e administradores, com controle para evitar reutilização.
 - Consulta de pedidos por número ou telefone cadastrado.
-- Marcação de cada linha de item como consumida/entregue, com prevenção de marcações duplicadas.
+- Controle de entrega por unidade: cada clique entrega uma unidade, permitindo retirada parcial de itens do mesmo pedido.
 - Geração de comprovante de compra em PDF.
 - Validação dos itens, dos preços e do estoque no servidor.
 - Senhas protegidas com hash usando bcrypt.
@@ -83,15 +83,17 @@ Aplicação web para simular as vendas e a organização de uma festa junina. Pr
 
 4. Configure um banco de teste que contenha as tabelas necessárias à aplicação: `produtos`, `clientes`, `usuarios`, `vendas`, `itens_venda` e `ingressos_emitidos`. **O dump do banco e os dados de usuários não fazem parte deste repositório.**
 
-5. Execute uma única vez o script `migracao-pedidos-consumo.sql` nesse banco para adicionar o telefone dos clientes e o campo de consumo dos itens. Faça backup antes de executar a migração.
+5. Execute uma única vez o script `migracao-pedidos-consumo.sql` nesse banco para adicionar o telefone dos clientes e o campo de consumo inicial dos itens. Faça backup antes de executar a migração.
 
-6. Inicie o servidor:
+6. Execute uma única vez o script `migracao-consumo-parcial.sql` para adicionar o contador de unidades entregues. Faça backup antes da execução; se já houver itens marcados como totalmente consumidos, a migração preserva esse estado.
+
+7. Inicie o servidor:
 
    ```bash
    npm start
    ```
 
-7. Abra [http://localhost:3000](http://localhost:3000).
+8. Abra [http://localhost:3000](http://localhost:3000).
 
 ## Variáveis de ambiente
 
