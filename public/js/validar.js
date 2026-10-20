@@ -908,18 +908,25 @@ async function carregarPedidos(busca) {
 
         resultadoPedidos.innerHTML = dados.pedidos.map((pedido) => {
             const itensHtml = pedido.itens.map((item) => {
-                const estado = item.consumido
-                    ? "✅ Item consumido"
-                    : "⏳ Aguardando entrega";
-                const botao = item.consumido
-                    ? '<button type="button" class="btn-consumir-item" disabled>✅ Consumido</button>'
-                    : `<button type="button" class="btn-consumir-item" data-venda="${Number(pedido.id)}" data-item="${Number(item.id)}" onclick="marcarItemConsumido(${Number(pedido.id)}, ${Number(item.id)})">☑ Marcar consumido</button>`;
+                const quantidade = Math.max(0, Number(item.quantidade) || 0);
+                const consumidas = Math.min(
+                    quantidade,
+                    Math.max(0, Number(item.quantidade_consumida) || 0)
+                );
+                const faltam = Math.max(0, quantidade - consumidas);
+                const completo = faltam === 0;
+                const estado = completo
+                    ? `✅ Todas as unidades entregues (${consumidas}/${quantidade})`
+                    : `⏳ Entregues: ${consumidas} de ${quantidade} · Faltam: ${faltam}`;
+                const botao = completo
+                    ? '<button type="button" class="btn-consumir-item" disabled>✅ Tudo entregue</button>'
+                    : `<button type="button" class="btn-consumir-item" data-venda="${Number(pedido.id)}" data-item="${Number(item.id)}" onclick="marcarItemConsumido(${Number(pedido.id)}, ${Number(item.id)})">☑ Entregar 1 unidade</button>`;
 
                 return `
                     <div class="pedido-item">
                         <div class="pedido-item-info">
                             <span class="pedido-item-nome">${escaparHTML(item.nome)}</span>
-                            <span class="pedido-item-detalhe">Quantidade comprada: ${Number(item.quantidade)} · Subtotal: ${formatarValorBRL(Number(item.preco) * Number(item.quantidade))}</span>
+                            <span class="pedido-item-detalhe">Quantidade comprada: ${quantidade} · Subtotal: ${formatarValorBRL(Number(item.preco) * quantidade)}</span>
                             <span class="pedido-item-detalhe">${estado}</span>
                         </div>
                         ${botao}
@@ -976,7 +983,7 @@ async function marcarItemConsumido(idVenda, idItem) {
         if (!resposta.ok) {
             alert(dados.mensagem || "Não foi possível marcar o item como consumido.");
             botao.disabled = false;
-            botao.textContent = "☑ Marcar consumido";
+            botao.textContent = "☑ Entregar 1 unidade";
             return;
         }
 
