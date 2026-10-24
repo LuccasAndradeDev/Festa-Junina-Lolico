@@ -59,7 +59,13 @@ function atualizarTudo() {
     atualizarCarrinho();
     atualizarDashboard();
     atualizarTotal();
-    renderizarProdutos(itens);
+
+    // Preserva os filtros atuais ao mudar a quantidade no carrinho.
+    if (typeof aplicarFiltros === "function") {
+        aplicarFiltros();
+    } else {
+        renderizarProdutos(itens);
+    }
 }
 
 document.addEventListener(
