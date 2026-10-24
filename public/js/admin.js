@@ -12,6 +12,17 @@ function escaparHTML(valor) {
         .replaceAll("'", "&#039;");
 }
 
+function urlImagemAdmin(valor) {
+    const imagem = String(valor ?? "").trim();
+
+    if (imagem.startsWith("/produto-imagens/")) {
+        return escaparHTML(imagem);
+    }
+
+    // Compatibilidade com imagens antigas em public/imagens.
+    return "imagens/" + escaparHTML(imagem);
+}
+
 async function verificarSessaoAdmin() {
     try {
         const resposta = await fetch("/sessao/admin");
@@ -216,7 +227,7 @@ document.getElementById(
                 <div class="produto-admin">
 
                     <img
-                        src="imagens/${escaparHTML(produto.imagem)}"
+                        src="${urlImagemAdmin(produto.imagem)}"
                         width="100"
                     >
 
@@ -508,7 +519,7 @@ async function excluirProduto(id) {
 
     const confirmar =
         confirm(
-            "Tem certeza que deseja excluir este produto?"
+            "Remover este produto do catálogo? Ele ficará oculto na loja, mas as vendas antigas serão preservadas."
         );
 
 
@@ -612,7 +623,7 @@ document.getElementById(
                 <div class="produto-admin">
 
                     <img
-                        src="imagens/${escaparHTML(produto.imagem)}"
+                        src="${urlImagemAdmin(produto.imagem)}"
                         width="80"
                     >
 
