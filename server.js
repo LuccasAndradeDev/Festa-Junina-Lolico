@@ -21,7 +21,7 @@ if (!process.env.SESSION_SECRET) {
 
 app.set("trust proxy", 1);
 
-app.use(express.json({ limit: "50kb" }));
+app.use(express.json({ limit: "4mb" }));
 
 app.use(
     helmet({
@@ -91,6 +91,38 @@ app.use(
         path.join(__dirname, "public")
     )
 );
+
+/* Imagens enviadas pelo painel e armazenadas no MySQL. */
+app.get("/produto-imagens/:id", async (req, res) => {
+    const id = String(req.params.id || "");
+
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+        return res.status(400).send("Imagem inválida.");
+    }
+
+    try {
+        const [imagens] = await db.promise().query(
+            `SELECT mime_type, imagem
+             FROM produto_imagens
+             WHERE id = ?
+             LIMIT 1`,
+            [id]
+        );
+
+        if (imagens.length === 0) {
+            return res.status(404).send("Imagem não encontrada.");
+        }
+
+        res.set("Content-Type", imagens[0].mime_type);
+        res.set("Cache-Control", "public, max-age=86400");
+        return res.send(imagens[0].imagem);
+    }
+    catch (erro) {
+        console.error("Erro ao carregar imagem do produto:", erro);
+        return res.status(500).send("Erro ao carregar imagem.");
+    }
+});
+
 
 // ==========================================
 // FUNÇÕES DE SEGURANÇA
@@ -527,7 +559,8 @@ app.post("/clientes/login", limiteLogin, async (req, res) => {
 app.get("/produtos", (req, res) => {
     db.query(
         `SELECT id, nome, preco, estoque, categoria, imagem
-         FROM produtos`,
+         FROM produtos
+         WHERE ativo = 1`,
         (erro, resultados) => {
             if (erro) {
                 console.error("Erro ao buscar produtos:", erro);
@@ -597,7 +630,7 @@ app.post("/vendas", exigirCliente, async (req, res) => {
             const [produtos] = await connection.query(
                 `SELECT id, nome, preco, estoque, categoria
                  FROM produtos
-                 WHERE id = ?
+                 WHERE id = ? AND ativo = 1
                  FOR UPDATE`,
                 [idProduto]
             );
@@ -1243,12 +1276,17 @@ function validarProduto(body) {
         return { erro: "Categoria inválida." };
     }
 
-    if (
-        !textoValido(imagem, 1, 200) ||
-        imagem.includes("..") ||
-        /[<>"']/.test(imagem)
-    ) {
-        return { erro: "Nome da imagem inválido." };
+    const imagemUploadValida =
+        /^\/produto-imagens\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(imagem);
+
+    const imagemLegadaValida =
+        textoValido(imagem, 1, 200) &&
+        !imagem.startsWith("/") &&
+        !imagem.includes("..") &&
+        !/[<>"']/.test(imagem);
+
+    if (!imagemUploadValida && !imagemLegadaValida) {
+        return { erro: "Imagem inválida. Selecione uma imagem válida." };
     }
 
     return {
@@ -1265,6 +1303,74 @@ function validarProduto(body) {
 // ==========================================
 // CADASTRAR PRODUTO
 // ==========================================
+
+// Upload de imagem de produto direto pelo painel administrativo.
+// Aceita JPEG, PNG e WebP de até 2 MiB; o binário fica no banco MySQL.
+app.post("/upload-imagem", exigirAdmin, async (req, res) => {
+    const imagemData = String(req.body?.imagemData || "");
+    const match = imagemData.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/]+={0,2})$/);
+
+    if (!match) {
+        return res.status(400).json({
+            sucesso: false,
+            mensagem: "Selecione uma imagem JPEG, PNG ou WebP válida."
+        });
+    }
+
+    const mimeType = match[1];
+    const imagemBuffer = Buffer.from(match[2], "base64");
+    const limiteBytes = 2 * 1024 * 1024;
+
+    if (!imagemBuffer.length || imagemBuffer.length > limiteBytes) {
+        return res.status(413).json({
+            sucesso: false,
+            mensagem: "A imagem deve ter no máximo 2 MiB."
+        });
+    }
+
+    const assinaturaValida =
+        (mimeType === "image/jpeg" &&
+            imagemBuffer.length >= 3 &&
+            imagemBuffer[0] === 0xff &&
+            imagemBuffer[1] === 0xd8 &&
+            imagemBuffer[2] === 0xff) ||
+        (mimeType === "image/png" &&
+            imagemBuffer.length >= 8 &&
+            imagemBuffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) ||
+        (mimeType === "image/webp" &&
+            imagemBuffer.length >= 12 &&
+            imagemBuffer.toString("ascii", 0, 4) === "RIFF" &&
+            imagemBuffer.toString("ascii", 8, 12) === "WEBP");
+
+    if (!assinaturaValida) {
+        return res.status(400).json({
+            sucesso: false,
+            mensagem: "O conteúdo do arquivo não corresponde ao formato informado."
+        });
+    }
+
+    try {
+        const id = crypto.randomUUID();
+
+        await db.promise().query(
+            `INSERT INTO produto_imagens (id, mime_type, imagem)
+             VALUES (?, ?, ?)`,
+            [id, mimeType, imagemBuffer]
+        );
+
+        return res.status(201).json({
+            sucesso: true,
+            imagem: `/produto-imagens/${id}`
+        });
+    }
+    catch (erro) {
+        console.error("Erro ao salvar imagem do produto:", erro);
+        return res.status(500).json({
+            sucesso: false,
+            mensagem: "Não foi possível salvar a imagem do produto."
+        });
+    }
+});
 
 app.post("/produtos", exigirAdmin, (req, res) => {
     const validacao = validarProduto(req.body);
@@ -1326,7 +1432,7 @@ app.put("/produtos/:id", exigirAdmin, (req, res) => {
     db.query(
         `UPDATE produtos
          SET nome = ?, preco = ?, estoque = ?, categoria = ?, imagem = ?
-         WHERE id = ?`,
+         WHERE id = ? AND ativo = 1`,
         [nome, preco, estoque, categoria, imagem, Number(req.params.id)],
         (erro, resultado) => {
             if (erro) {
@@ -1365,27 +1471,27 @@ app.delete("/produtos/:id", exigirAdmin, (req, res) => {
     }
 
     db.query(
-        `DELETE FROM produtos WHERE id = ?`,
+        `UPDATE produtos SET ativo = 0 WHERE id = ? AND ativo = 1`,
         [Number(req.params.id)],
         (erro, resultado) => {
             if (erro) {
-                console.error("Erro ao excluir produto:", erro);
+                console.error("Erro ao remover produto do catálogo:", erro);
                 return res.status(500).json({
                     sucesso: false,
-                    mensagem: "Erro ao excluir produto."
+                    mensagem: "Erro ao remover produto do catálogo."
                 });
             }
 
             if (resultado.affectedRows === 0) {
                 return res.status(404).json({
                     sucesso: false,
-                    mensagem: "Produto não encontrado."
+                    mensagem: "Produto não encontrado ou já removido do catálogo."
                 });
             }
 
             return res.json({
                 sucesso: true,
-                mensagem: "Produto excluído com sucesso!"
+                mensagem: "Produto removido do catálogo. O histórico de vendas foi preservado."
             });
         }
     );
