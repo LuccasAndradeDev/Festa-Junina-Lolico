@@ -15,6 +15,8 @@ Aplicação web para simular as vendas e a organização de uma festa junina. Pr
 - Carrinho e registro de vendas.
 - Histórico de compras do cliente.
 - Área administrativa para consultar vendas e gerenciar produtos.
+- Cadastro de produto com upload de imagem diretamente pelo painel; imagens enviadas são armazenadas no MySQL.
+- Remoção segura de produtos do catálogo sem apagar o histórico de vendas.
 - Emissão de ingressos individuais com QR Code.
 - Validação de ingressos por funcionários e administradores, com controle para evitar reutilização.
 - Consulta de pedidos por número ou telefone cadastrado.
@@ -87,13 +89,15 @@ Aplicação web para simular as vendas e a organização de uma festa junina. Pr
 
 6. Execute uma única vez o script `migracao-consumo-parcial.sql` para adicionar o contador de unidades entregues. Faça backup antes da execução; se já houver itens marcados como totalmente consumidos, a migração preserva esse estado.
 
-7. Inicie o servidor:
+7. Execute uma única vez o script `migracao-catalogo-imagens.sql` para habilitar a remoção segura do catálogo e criar a tabela que armazena imagens. Faça backup antes da execução.
+
+8. Inicie o servidor:
 
    ```bash
    npm start
    ```
 
-8. Abra [http://localhost:3000](http://localhost:3000).
+9. Abra [http://localhost:3000](http://localhost:3000).
 
 ## Variáveis de ambiente
 
