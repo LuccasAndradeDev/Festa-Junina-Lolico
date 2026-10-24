@@ -7,6 +7,17 @@ function escaparHTMLProduto(valor) {
         .replaceAll("'", "&#039;");
 }
 
+function urlImagemProduto(valor) {
+    const imagem = String(valor ?? "").trim();
+
+    if (imagem.startsWith("/produto-imagens/")) {
+        return escaparHTMLProduto(imagem);
+    }
+
+    // Compatibilidade com as imagens antigas salvas em public/imagens.
+    return "imagens/" + escaparHTMLProduto(imagem);
+}
+
 let itens = [];
 
 function ehIngresso(item) {
@@ -196,7 +207,7 @@ function renderizarProdutos(lista) {
         <section class="card">
 
             <img
-                src="imagens/${escaparHTMLProduto(item.imagem)}"
+                src="${urlImagemProduto(item.imagem)}"
                 class="produto-img"
             >
 
