@@ -15,7 +15,7 @@ Aplicação web para simular as vendas e a organização de uma festa junina. Pr
 - Carrinho e registro de vendas.
 - Histórico de compras do cliente.
 - Área administrativa para consultar vendas e gerenciar produtos.
-- Cadastro de produto com upload de imagem diretamente pelo painel; imagens enviadas são armazenadas no MySQL.
+- Cadastro de produto com upload de imagem diretamente pelo painel (JPEG, PNG ou WebP até 2 MiB); imagens enviadas são armazenadas no MySQL.
 - Remoção segura de produtos do catálogo sem apagar o histórico de vendas.
 - Emissão de ingressos individuais com QR Code.
 - Validação de ingressos por funcionários e administradores, com controle para evitar reutilização.
