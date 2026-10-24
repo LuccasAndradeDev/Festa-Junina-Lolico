@@ -42,10 +42,21 @@
                 id="estoque"
                 placeholder="Quantidade em estoque">
 
+            <label for="imagem">Imagem do produto</label>
+
             <input
-                type="text"
+                type="file"
                 id="imagem"
-                placeholder="Nome da imagem (ex: pipoca.png)">
+                accept="image/jpeg,image/png,image/webp"
+                aria-describedby="ajuda-imagem"
+                required>
+
+            <small id="ajuda-imagem">JPEG, PNG ou WebP · tamanho máximo: 2 MiB</small>
+
+            <img
+                id="imagem-preview"
+                alt="Prévia da imagem do produto"
+                style="display:none; max-width:100%; max-height:240px; object-fit:contain; border-radius:12px;">
 
             <button onclick="salvarProduto()">
 
