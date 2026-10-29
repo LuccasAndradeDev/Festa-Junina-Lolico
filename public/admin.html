@@ -187,11 +187,28 @@
             >
 
 
-            <label>Imagem</label>
+            <label for="editar-imagem">Imagem do produto</label>
 
             <input
-                type="text"
+                type="hidden"
+                id="editar-imagem-atual"
+            >
+
+            <input
+                type="file"
                 id="editar-imagem"
+                accept="image/jpeg,image/png,image/webp"
+                aria-describedby="ajuda-editar-imagem"
+            >
+
+            <small id="ajuda-editar-imagem">
+                JPEG, PNG ou WebP · máximo 2 MiB. Se não selecionar uma nova imagem, a foto atual será mantida.
+            </small>
+
+            <img
+                id="editar-imagem-preview"
+                alt="Prévia da imagem do produto"
+                style="display:none; max-width:100%; max-height:240px; object-fit:contain; border-radius:12px; margin-top:12px;"
             >
 
 
