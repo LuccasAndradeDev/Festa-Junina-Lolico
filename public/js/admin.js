@@ -302,212 +302,214 @@ document.getElementById(
 // EDITAR PRODUTO
 // ======================================================
 
-async function editarProduto(id) {
+let urlPreviewEdicaoTemporaria = null;
 
-    try {
+function revogarPreviewEdicaoTemporaria() {
+    if (urlPreviewEdicaoTemporaria) {
+        URL.revokeObjectURL(urlPreviewEdicaoTemporaria);
+        urlPreviewEdicaoTemporaria = null;
+    }
+}
 
-        const resposta =
-            await fetch("/produtos");
+function mostrarImagemAtualEdicao() {
+    const preview = document.getElementById("editar-imagem-preview");
+    const campoImagemAtual = document.getElementById("editar-imagem-atual");
+    if (!preview || !campoImagemAtual) return;
 
+    revogarPreviewEdicaoTemporaria();
 
-        const produtos =
-            await resposta.json();
+    const imagemAtual = campoImagemAtual.value.trim();
+    if (!imagemAtual) {
+        preview.removeAttribute("src");
+        preview.style.display = "none";
+        return;
+    }
 
+    preview.src = urlImagemAdmin(imagemAtual);
+    preview.style.display = "block";
+}
 
-        const produto =
-            produtos.find(
-                item => item.id === id
-            );
+function validarArquivoImagemEdicao(arquivo) {
+    const tiposPermitidos = ["image/jpeg", "image/png", "image/webp"];
 
+    if (!tiposPermitidos.includes(arquivo.type)) {
+        alert("Selecione uma imagem JPEG, PNG ou WebP.");
+        return false;
+    }
 
-        if (!produto) {
+    if (arquivo.size > 2 * 1024 * 1024) {
+        alert("A imagem deve ter no máximo 2 MiB.");
+        return false;
+    }
 
-            alert(
-                "Produto não encontrado."
-            );
+    return true;
+}
 
+function lerImagemEdicaoComoDataURL(arquivo) {
+    return new Promise((resolve, reject) => {
+        const leitor = new FileReader();
+        leitor.onload = () => resolve(String(leitor.result || ""));
+        leitor.onerror = () => reject(new Error("Não foi possível ler a imagem selecionada."));
+        leitor.readAsDataURL(arquivo);
+    });
+}
+
+const campoImagemEdicao = document.getElementById("editar-imagem");
+
+if (campoImagemEdicao) {
+    campoImagemEdicao.addEventListener("change", () => {
+        const arquivo = campoImagemEdicao.files && campoImagemEdicao.files[0];
+        const preview = document.getElementById("editar-imagem-preview");
+
+        if (!arquivo) {
+            mostrarImagemAtualEdicao();
             return;
-
         }
 
+        if (!validarArquivoImagemEdicao(arquivo)) {
+            campoImagemEdicao.value = "";
+            mostrarImagemAtualEdicao();
+            return;
+        }
+
+        revogarPreviewEdicaoTemporaria();
+        urlPreviewEdicaoTemporaria = URL.createObjectURL(arquivo);
+
+        if (preview) {
+            preview.src = urlPreviewEdicaoTemporaria;
+            preview.style.display = "block";
+        }
+    });
+}
+
+async function editarProduto(id) {
+    try {
+        const resposta = await fetch("/produtos");
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar produtos.");
+        }
+
+        const produtos = await resposta.json();
+        const produto = produtos.find(item => Number(item.id) === Number(id));
+
+        if (!produto) {
+            alert("Produto não encontrado.");
+            return;
+        }
 
         esconderTelas();
 
+        document.getElementById("editar-produto").style.display = "block";
+        document.getElementById("editar-id").value = produto.id;
+        document.getElementById("editar-nome").value = produto.nome;
+        document.getElementById("editar-preco").value = produto.preco;
+        document.getElementById("editar-estoque").value = produto.estoque;
+        document.getElementById("editar-categoria").value = produto.categoria;
 
-        document.getElementById(
-            "editar-produto"
-        ).style.display = "block";
-
-
-        document.getElementById(
-            "editar-id"
-        ).value =
-            produto.id;
-
-
-        document.getElementById(
-            "editar-nome"
-        ).value =
-            produto.nome;
-
-
-        document.getElementById(
-            "editar-preco"
-        ).value =
-            produto.preco;
-
-
-        document.getElementById(
-            "editar-estoque"
-        ).value =
-            produto.estoque;
-
-
-        document.getElementById(
-            "editar-categoria"
-        ).value =
-            produto.categoria;
-
-
-        document.getElementById(
-            "editar-imagem"
-        ).value =
-            produto.imagem;
-
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        alert(
-            "Erro ao carregar produto."
-        );
-
+        document.getElementById("editar-imagem-atual").value = produto.imagem || "";
+        document.getElementById("editar-imagem").value = "";
+        mostrarImagemAtualEdicao();
     }
-
+    catch (erro) {
+        console.error("Erro ao carregar produto para edição:", erro);
+        alert(erro.message || "Erro ao carregar produto.");
+    }
 }
-
 
 async function salvarEdicao() {
+    const id = document.getElementById("editar-id").value;
+    const nome = document.getElementById("editar-nome").value.trim();
+    const preco = Number.parseFloat(document.getElementById("editar-preco").value);
+    const estoque = Number.parseInt(document.getElementById("editar-estoque").value, 10);
+    const categoria = document.getElementById("editar-categoria").value.trim();
+    const campoImagem = document.getElementById("editar-imagem");
+    const arquivo = campoImagem && campoImagem.files && campoImagem.files[0];
+    let imagem = document.getElementById("editar-imagem-atual").value.trim();
 
-    const id =
-        document.getElementById(
-            "editar-id"
-        ).value;
-
-
-    const nome =
-        document.getElementById(
-            "editar-nome"
-        ).value.trim();
-
-
-    const preco =
-        parseFloat(
-            document.getElementById(
-                "editar-preco"
-            ).value
-        );
-
-
-    const estoque =
-        parseInt(
-            document.getElementById(
-                "editar-estoque"
-            ).value
-        );
-
-
-    const categoria =
-        document.getElementById(
-            "editar-categoria"
-        ).value.trim();
-
-
-    const imagem =
-        document.getElementById(
-            "editar-imagem"
-        ).value.trim();
-
-
-    if (
-        !nome ||
-        !categoria ||
-        !imagem ||
-        isNaN(preco) ||
-        isNaN(estoque)
-    ) {
-
-        alert(
-            "Preencha todos os campos."
-        );
-
+    if (!nome || !categoria || !imagem || !Number.isFinite(preco) || !Number.isInteger(estoque)) {
+        alert("Preencha todos os campos obrigatórios.");
         return;
-
     }
 
+    if (preco < 0 || estoque < 0) {
+        alert("O preço e o estoque não podem ser negativos.");
+        return;
+    }
+
+    if (arquivo && !validarArquivoImagemEdicao(arquivo)) {
+        campoImagem.value = "";
+        mostrarImagemAtualEdicao();
+        return;
+    }
+
+    const botaoSalvar = document.getElementById("btn-salvar-edicao");
+    if (botaoSalvar) {
+        botaoSalvar.disabled = true;
+        botaoSalvar.textContent = "Salvando...";
+    }
 
     try {
+        // Só envia uma imagem nova quando o usuário selecionar um arquivo.
+        // Caso contrário, mantém o caminho atual salvo no produto.
+        if (arquivo) {
+            if (botaoSalvar) botaoSalvar.textContent = "Enviando imagem...";
 
-        const resposta =
-            await fetch(
-                `/produtos/${id}`,
-                {
+            const imagemData = await lerImagemEdicaoComoDataURL(arquivo);
+            const respostaUpload = await fetch("/upload-imagem", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ imagemData })
+            });
 
-                    method: "PUT",
+            const dadosUpload = await respostaUpload.json();
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+            if (!respostaUpload.ok || !dadosUpload.sucesso || !dadosUpload.imagem) {
+                throw new Error(dadosUpload.mensagem || "Não foi possível enviar a imagem.");
+            }
 
-                    body: JSON.stringify({
-
-                        nome,
-                        preco,
-                        estoque,
-                        categoria,
-                        imagem
-
-                    })
-
-                }
-            );
-
-
-        const dados =
-            await resposta.json();
-
-
-        alert(dados.mensagem);
-
-
-        if (dados.sucesso) {
-
-            document.getElementById(
-                "btn-produtos"
-            ).click();
-
+            imagem = dadosUpload.imagem;
         }
 
+        if (botaoSalvar) botaoSalvar.textContent = "Salvando alterações...";
 
-    } catch (erro) {
+        const resposta = await fetch("/produtos/" + encodeURIComponent(id), {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nome,
+                preco,
+                estoque,
+                categoria,
+                imagem
+            })
+        });
 
-        console.error(erro);
+        const dados = await resposta.json();
 
-        alert(
-            "Erro ao atualizar produto."
-        );
+        if (!resposta.ok || !dados.sucesso) {
+            throw new Error(dados.mensagem || "Erro ao atualizar produto.");
+        }
 
+        alert(dados.mensagem || "Produto atualizado com sucesso!");
+        revogarPreviewEdicaoTemporaria();
+        document.getElementById("btn-produtos").click();
     }
-
+    catch (erro) {
+        console.error("Erro ao atualizar produto:", erro);
+        alert(erro.message || "Erro ao atualizar produto.");
+    }
+    finally {
+        if (botaoSalvar) {
+            botaoSalvar.disabled = false;
+            botaoSalvar.textContent = "💾 Salvar Alterações";
+        }
+    }
 }
 
-
 function cancelarEdicao() {
-
+    revogarPreviewEdicaoTemporaria();
     esconderTelas();
-
 }
 
 
